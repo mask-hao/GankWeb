@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhanghao.dao.GankDao">
+
+    <resultMap id="BaseResultMap" type="com.zhanghao.entity.GankFav">
+        <id column="fav_id" jdbcType="VARCHAR" property="fav_id" />
+        <result column="fav_desc" jdbcType="VARCHAR" property="fav_desc" />
+        <result column="fav_type" jdbcType="VARCHAR" property="fav_type" />
+        <result column="fav_images" jdbcType="VARCHAR" property="fav_images" />
+        <result column="fav_url" jdbcType="VARCHAR" property="fav_url" />
+    </resultMap>
+
+    <!--<select id="selectById" resultMap="BaseResultMap">-->
+        <!--SELECT userId,resUrl-->
+        <!--FROM gankfavorite-->
+        <!--WHERE userId = #{userId}-->
+    <!--</select>-->
+
+    <select id="selectFavById" resultMap="BaseResultMap">
+      SELECT favorite.fav_id,fav_desc,fav_type,fav_url,fav_images
+      FROM favorite,user_fav
+      WHERE favorite.fav_id = user_fav.fav_id
+      AND user_fav.userId = #{userId};
+    </select>
+    <select id="selectFavByTypeAndId" resultMap="BaseResultMap">
+      SELECT favorite.fav_id,fav_desc,fav_type,fav_url,fav_images
+      FROM favorite,user_fav
+      WHERE favorite.fav_id = user_fav.fav_id
+      AND user_fav.userId = #{userId}
+      AND favorite.fav_type = #{fav_type};
+    </select>
+
+    <insert id="addOneFav">
+        INSERT ignore INTO favorite (fav_id,fav_desc,fav_type,fav_images,fav_url)
+        VALUES (#{fav_id},#{fav_desc},#{fav_type},#{fav_images},#{fav_url});
+    </insert>
+    <insert id="addOneFav_User">
+        INSERT INTO user_fav(userId,fav_id)
+        VALUES (#{userId},#{fav_id})
+    </insert>
+
+</mapper>
