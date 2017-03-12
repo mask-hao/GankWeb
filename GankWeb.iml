@@ -65,5 +65,6 @@
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.8.0" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.retrofit2:converter-gson:2.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.10.2" level="project" />
   </component>
 </module>
