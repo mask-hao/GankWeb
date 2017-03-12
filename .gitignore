@@ -1,5 +1,8 @@
+#配置文件及无用的class文件
 *.iml
-*.idea
+.idea/
 *.properties
+target/
+src/main/resources/*.properties
 
 
