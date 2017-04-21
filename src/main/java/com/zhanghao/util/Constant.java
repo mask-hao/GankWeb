@@ -30,6 +30,9 @@ public class Constant {
     public static final String UPDATEPASS_ERROR = "密码更新失败";
     public static final String OLDPASS_ERROR = "旧密码错误";
 
+    public static final String GET_DATE_SUCCESS="获取日期成功";
+    public static final String GET_DATE_FAILED="获取日期失败";
+
 
     public static final String ANDROID="Android";
     public static final String IOS="iOS";

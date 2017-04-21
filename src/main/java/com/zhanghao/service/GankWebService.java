@@ -54,4 +54,11 @@ public interface GankWebService {
 
     boolean addOneFav(User user,GankItemFWB.ResultsBean itemFWB);
 
+    /**
+     * 获取日期
+     * @param page
+     * @return
+     */
+    GankItemFWB getDate(int page);
+
 }

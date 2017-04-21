@@ -34,4 +34,10 @@ public interface GankService{
             @Path("date") String date
     );
 
+
+    @GET("/api/data/福利/1/{page}")
+    Call<GankItemFWB> getDate(
+            @Path("page")int page
+            );
+
 }

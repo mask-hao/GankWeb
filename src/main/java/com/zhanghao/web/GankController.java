@@ -12,7 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,6 +32,49 @@ public class GankController {
     private GankWebService gankWebService;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
+
+    @RequestMapping(value = "/getDate/{page}",method = RequestMethod.GET)
+    public @ResponseBody CommonMessage getDate(@PathVariable("page")int page){
+           CommonMessage commonMessage=new CommonMessage();
+           gankWebService.init();
+           GankItemFWB gankItemFWB = gankWebService.getDate(page);
+           if (gankItemFWB!=null){
+              String published = gankItemFWB.getResults().get(0).getPublishedAt();
+              String date = getFormatDate(published);
+              if (!date.isEmpty()){
+                  commonMessage.setResult(Constant.GET_DATE_SUCCESS);
+                  commonMessage.setContent(date);
+                  return commonMessage;
+              }else{
+                  commonMessage.setResult(Constant.GET_DATE_FAILED);
+                  commonMessage.setContent("");
+                  return commonMessage;
+              }
+           }else{
+               commonMessage.setResult(Constant.GET_DATE_FAILED);
+               commonMessage.setContent("");
+               return commonMessage;
+           }
+
+    }
+
+
+    private String getFormatDate(String date){
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+        Date date1= null;
+        try {
+            date1 = dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+        dateFormat.applyPattern("yyyy/MM/dd");
+        return dateFormat.format(date1);
+    }
+
+
 
 
     @RequestMapping(value = "/addFav/{token}", method = RequestMethod.POST)

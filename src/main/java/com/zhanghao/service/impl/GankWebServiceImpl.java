@@ -90,4 +90,14 @@ public class GankWebServiceImpl implements GankWebService {
 
     }
 
+    @Override
+    public GankItemFWB getDate(int page) {
+        try {
+            return gankService.getDate(page).execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }
