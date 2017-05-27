@@ -1,7 +1,4 @@
 package com.zhanghao.util;
-
-import com.sun.javafx.binding.StringFormatter;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

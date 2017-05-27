@@ -4,41 +4,67 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zhanghao.dao.GankDao">
 
-    <resultMap id="BaseResultMap" type="com.zhanghao.entity.GankFav">
-        <id column="fav_id" jdbcType="VARCHAR" property="fav_id" />
-        <result column="fav_desc" jdbcType="VARCHAR" property="fav_desc" />
-        <result column="fav_type" jdbcType="VARCHAR" property="fav_type" />
-        <result column="fav_images" jdbcType="VARCHAR" property="fav_images" />
-        <result column="fav_url" jdbcType="VARCHAR" property="fav_url" />
+    <resultMap id="BaseResultMap" type="com.zhanghao.entity.GankFavItem">
+        <id column="_id" jdbcType="VARCHAR" property="_id" />
+        <result column="createdAt" jdbcType="VARCHAR" property="createdAt" />
+        <result column="desc" jdbcType="VARCHAR" property="desc" />
+        <result column="images" jdbcType="VARCHAR" property="images" />
+        <result column="publishAt" jdbcType="VARCHAR" property="publishedAt" />
+        <result column="source" jdbcType="VARCHAR" property="source" />
+        <result column="type" jdbcType="VARCHAR" property="type" />
+        <result column="used" jdbcType="INTEGER" property="used" />
+        <result column="who" jdbcType="VARCHAR" property="who" />
     </resultMap>
 
-    <!--<select id="selectById" resultMap="BaseResultMap">-->
-        <!--SELECT userId,resUrl-->
-        <!--FROM gankfavorite-->
-        <!--WHERE userId = #{userId}-->
-    <!--</select>-->
 
-    <select id="selectFavById" resultMap="BaseResultMap">
-      SELECT favorite.fav_id,fav_desc,fav_type,fav_url,fav_images
-      FROM favorite,user_fav
-      WHERE favorite.fav_id = user_fav.fav_id
-      AND user_fav.userId = #{userId};
-    </select>
-    <select id="selectFavByTypeAndId" resultMap="BaseResultMap">
-      SELECT favorite.fav_id,fav_desc,fav_type,fav_url,fav_images
-      FROM favorite,user_fav
-      WHERE favorite.fav_id = user_fav.fav_id
+
+    <select id="selectFavByType" resultMap="BaseResultMap">
+      SELECT *
+      FROM
+      favorite,user_fav
+      WHERE
+      favorite._id = user_fav._id
       AND user_fav.userId = #{userId}
-      AND favorite.fav_type = #{fav_type};
+      AND favorite.type = #{type}
+      LIMIT #{offset},#{count};
     </select>
 
-    <insert id="addOneFav">
-        INSERT ignore INTO favorite (fav_id,fav_desc,fav_type,fav_images,fav_url)
-        VALUES (#{fav_id},#{fav_desc},#{fav_type},#{fav_images},#{fav_url});
+    <select id="selectFavIdsByUserId" resultType="String">
+            SELECT _id
+            FROM user_fav
+            WHERE userId=#{userId};
+    </select>
+
+
+    <select id="selectFavIdsByUserIdAndType" resultType="String">
+        SELECT user_fav._id
+        FROM user_fav,favorite
+        WHERE userId=#{userId}
+        AND favorite.type=#{type}
+        ;
+    </select>
+
+
+
+
+    <insert id="addOneFav" parameterType="GankFavItem">
+        INSERT ignore INTO favorite
+        VALUES (#{_id},#{createdAt},#{desc},#{images},#{publishedAt},#{source},#{type},#{url},#{used},#{who});
     </insert>
+
+
     <insert id="addOneFav_User">
-        INSERT INTO user_fav(userId,fav_id)
+        INSERT ignore INTO user_fav(userId,_id)
         VALUES (#{userId},#{fav_id})
     </insert>
+
+    <delete id="deleteOneFav_User">
+        DELETE FROM user_fav
+        WHERE userId=#{userId}
+        AND _id=#{_id};
+    </delete>
+
+
+
 
 </mapper>

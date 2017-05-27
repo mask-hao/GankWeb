@@ -1,9 +1,5 @@
 package com.zhanghao.service;
-
-import com.zhanghao.entity.GankDailyAllItemFWB;
-import com.zhanghao.entity.GankFav;
-import com.zhanghao.entity.GankItemFWB;
-import com.zhanghao.entity.User;
+import com.zhanghao.entity.*;
 
 import java.util.List;
 
@@ -19,9 +15,9 @@ public interface GankWebService {
     /**
      * 获取最新的文章
      * @param date 日期
-     * @return GankDailyAllItemFWB 对象
+     * @return Gank 对象
      */
-    GankDailyAllItemFWB getLatestRes(String date);
+    Gank getLatestRes(String date);
 
 
     /**
@@ -30,7 +26,7 @@ public interface GankWebService {
      * @param page 页数
      * @return gankitemFwb
      */
-    GankItemFWB getResByType(String type,int page);
+    GankTypeItem getResByType(String type, int page);
 
 
 
@@ -40,7 +36,7 @@ public interface GankWebService {
      * @param userId  用户id
      * @return list
      */
-    List<GankFav> getFavListById(int userId);
+//    List<GankItem> getFavListById(int userId);
 
 
     /**
@@ -49,16 +45,23 @@ public interface GankWebService {
      * @param type 收藏的类型
      * @return list
      */
-    List<GankFav> getFavListByIdAndType(int userId,String type);
+     List<GankFavItem> getFavListByType(int userId, String type, int page, int count);
 
 
-    boolean addOneFav(User user,GankItemFWB.ResultsBean itemFWB);
+    boolean addOneFav(User user,GankItem item);
+
+    boolean deleteOneFav_User(int userId,String _id);
+
+    List<String> selectFavIdsByUserId(int userId);
+
+
+    List<String> selectFavIdsByUserIdAndType(int userId,String type);
 
     /**
      * 获取日期
      * @param page
      * @return
      */
-    GankItemFWB getDate(int page);
+    GankTypeItem getDate(int page);
 
 }

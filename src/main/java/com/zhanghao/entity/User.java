@@ -5,12 +5,42 @@ import com.google.gson.Gson;
 /**
  * Created by 张浩 on 2017/1/20.
  */
-public class User {
+public class User{
     private int userId;
     private String userName;
     private String userAccount;
     private String userPassword;
     private String userImage;
+
+    public String getVerifyCode() {
+        return verifyCode;
+    }
+
+    public void setVerifyCode(String verifyCode) {
+        this.verifyCode = verifyCode;
+    }
+
+    private String verifyCode;
+
+    public String getVerifyId() {
+        return verifyId;
+    }
+
+    public void setVerifyId(String verifyId) {
+        this.verifyId = verifyId;
+    }
+
+    private String verifyId;
+
+    public boolean isLogin() {
+        return login;
+    }
+
+    public void setLogin(boolean login) {
+        this.login = login;
+    }
+
+    private boolean login;
 
     public int getUserId() {
         return userId;

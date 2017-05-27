@@ -1,6 +1,8 @@
 package com.zhanghao.util;
 
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 /**
  * Created by 张浩 on 2017/1/23.
  */
@@ -25,14 +27,27 @@ public class Constant {
     public static final String LOGOUT_ERROR= "登出失败";
     public static final String ADDFAV_SUCCESS = "收藏成功";
     public static final String ADDFAV_ERROR = "收藏失败";
+    public static final String DELETE_FAV_SUCCESS="删除收藏成功";
+    public static final String DELETE_FAV_ERROR="删除收藏失败";
     public static final String ACCOUNT_USED = "该账号已经被注册";
     public static final String UPDATEPASS_SUCCESS = "密码更新成功";
     public static final String UPDATEPASS_ERROR = "密码更新失败";
     public static final String OLDPASS_ERROR = "旧密码错误";
+    public static final String NO_MORE_DATA="暂无更多数据";
 
+    public static final String SEND_EMAIL_SUCCESS="发送邮件成功";
+    public static final String SEND_EMAIL_ERROR="发送邮件失败";
+    public static final String VERIFY_CODE_ERROR="验证码错误";
+    public static final String VERIFY_CODE_INVALIDATE="验证码失效";
     public static final String GET_DATE_SUCCESS="获取日期成功";
     public static final String GET_DATE_FAILED="获取日期失败";
 
+    public static final String GET_SEARCH_DATA_SUCCESS="获取搜索数据正确";
+    public static final String GET_SEARCH_DATA_ERROR="获取搜索数据错误";
+
+
+    public static final String GET_START_IMG_SUCCESS="获取首页图片成功";
+    public static final String GET_START_IMG_ERROR="获取首页图片失败";
 
     public static final String ANDROID="Android";
     public static final String IOS="iOS";
@@ -42,6 +57,7 @@ public class Constant {
     public static final String EXPANDRES="拓展资源";
     public static final String RECOMMEND="瞎推荐";
     public static final String APP="app";
+
 
 
 }

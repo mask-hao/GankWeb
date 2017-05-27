@@ -52,8 +52,17 @@ public class UserServiceImpl implements UserService{
     @Override
     public boolean logout(String token) {
         HttpSession httpSession=userPool.get(token);
-        httpSession.invalidate();
-        return userPool.removeUser(token);
+        if (httpSession!=null){
+            logger.info("httpSession不为空！！！");
+            httpSession.invalidate();
+            userPool.removeUser(token);
+            return true;
+        }else{
+            logger.info("httpSession为空！！！");
+            return false;
+
+        }
+
     }
 
     @Override
@@ -64,6 +73,11 @@ public class UserServiceImpl implements UserService{
     @Override
     public User getUserByUserAccount(String userAccount) {
         return userDao.findUserByAccount(userAccount);
+    }
+
+    @Override
+    public boolean removeUserByUserAccount(String userAccount) {
+       return userPool.removeUserByAccount(userAccount);
     }
 
     @Override

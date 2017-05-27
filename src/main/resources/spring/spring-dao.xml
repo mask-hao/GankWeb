@@ -7,16 +7,16 @@
 
     <!--配置整合MyBits过程-->
     <!--1.配置数据库的相关参数-->
-    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--<context:property-placeholder location="classpath:jdbc.properties"/>-->
 
 
     <!--2.配置数据库连接池-->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <!--配置连接池属性-->
-        <property name="driverClass" value="${driver}" />
-        <property name="jdbcUrl" value="${url}" />
-        <property name="user" value="${user}" />
-        <property name="password" value="${password}" />
+        <property name="driverClass" value="${jdbc.driver}" />
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="user" value="${jdbc.user}" />
+        <property name="password" value="${jdbc.password}" />
         <!--c3p0连接池私有属性-->
         <property name="maxPoolSize" value="30"/>
         <property name="minPoolSize" value="10"/>

@@ -2,6 +2,7 @@ package com.zhanghao.dao;
 
 import com.zhanghao.entity.User;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * Created by 张浩 on 2017/1/20.

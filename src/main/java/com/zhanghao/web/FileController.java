@@ -1,8 +1,7 @@
 package com.zhanghao.web;
 
-import com.sun.javafx.binding.StringFormatter;
 import com.zhanghao.entity.User;
-import com.zhanghao.model.CommonMessage;
+import com.zhanghao.model.CommonResponse;
 import com.zhanghao.service.UserService;
 import com.zhanghao.util.ConfigUtil;
 import com.zhanghao.util.Constant;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +26,7 @@ import java.util.UUID;
  * Created by 张浩 on 2017/1/29.
  */
 @Controller
-@RequestMapping(value = "/api/upload")
+@RequestMapping(value = "/api/upload",produces = {"application/json;charset=UTF-8"})
 public class FileController {
     private Logger logger= LoggerFactory.getLogger(this.getClass());
     @Resource
@@ -36,14 +34,12 @@ public class FileController {
 
     @RequestMapping(value = "/userImage",method = RequestMethod.POST)
     public @ResponseBody
-    CommonMessage uploadUserImage(@RequestParam("token")String token, @RequestParam("file")MultipartFile multipartFile, HttpServletRequest request){
-        CommonMessage message=new CommonMessage();
+    CommonResponse<String> uploadUserImage(@RequestParam("token")String token, @RequestParam("file")MultipartFile multipartFile, HttpServletRequest request){
+        CommonResponse<String> message=new CommonResponse<>();
         try {
             if (!token.equals("")&&!token.isEmpty()&&userService.checkUser(token)){
                 if (!multipartFile.isEmpty()){
                         try {
-
-
 
                             String realPath= ConfigUtil.getFileStorePath();
                             int point=multipartFile.getOriginalFilename().lastIndexOf(".");
@@ -55,7 +51,6 @@ public class FileController {
                             if (Files.notExists(filePath)) {
                                 Files.createDirectories(filePath);
                             }
-
 
                             File saveFile=new File(realPath+"/"+fileName);
                             multipartFile.transferTo(saveFile);
@@ -75,7 +70,7 @@ public class FileController {
                                 return message;
                             }else{
                                 message.setResult(Constant.FILEUPLOAD_ERROR);
-                                message.setResult(Constant.DBUPDATE_ERROR);
+                                message.setContent(Constant.DBUPDATE_ERROR);
                                 return message;
                             }
                         } catch (IOException e) {
@@ -90,12 +85,14 @@ public class FileController {
                         return message;
                     }
                 }else{
-                    message.setResult(Constant.USER_INVALID);
+                    message.setResult(Constant.FILEUPLOAD_ERROR);
+                    message.setContent(Constant.USER_INVALID);
                     return message;
                 }
         }catch (NullPointerException e){
             e.printStackTrace();
-            message.setResult(Constant.TOKEN_EMPTY);
+            message.setResult(Constant.FILEUPLOAD_ERROR);
+            message.setContent(Constant.TOKEN_EMPTY);
             return message;
         }
     }

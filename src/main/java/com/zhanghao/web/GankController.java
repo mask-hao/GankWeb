@@ -1,29 +1,34 @@
 package com.zhanghao.web;
 
 import com.zhanghao.entity.*;
-import com.zhanghao.model.CommonMessage;
-import com.zhanghao.model.GankFavMessage;
+import com.zhanghao.model.CommonResponse;
 import com.zhanghao.service.UserService;
 import com.zhanghao.service.GankWebService;
 import com.zhanghao.util.Constant;
+import com.zhanghao.util.GankHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.WebContentGenerator;
+import retrofit2.http.Body;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by 张浩 on 2017/1/30.
  */
 @Controller
-@RequestMapping("/api")
-public class GankController {
+@RequestMapping(value = "/api",produces = {"application/json;charset=UTF-8"})
+public class GankController extends WebContentGenerator {
 
 
     @Resource
@@ -33,33 +38,38 @@ public class GankController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
+    private GankHelper gankHelper=GankHelper.getInstance();
 
     @RequestMapping(value = "/getDate/{page}",method = RequestMethod.GET)
-    public @ResponseBody CommonMessage getDate(@PathVariable("page")int page){
-           CommonMessage commonMessage=new CommonMessage();
+    public @ResponseBody
+    CommonResponse<String> getDate(@PathVariable("page")int page){
+
+
+        CacheControl cacheControl=CacheControl.maxAge(0, TimeUnit.SECONDS);
+        cacheControl.cachePublic();
+
+           CommonResponse<String> commonResponse =new CommonResponse<>();
            gankWebService.init();
-           GankItemFWB gankItemFWB = gankWebService.getDate(page);
-           if (gankItemFWB!=null){
-              String published = gankItemFWB.getResults().get(0).getPublishedAt();
+           GankTypeItem typeItem = gankWebService.getDate(page);
+           if (typeItem!=null){
+              String published = typeItem.getResult().get(0).getPublishedAt();
               String date = getFormatDate(published);
               if (!date.isEmpty()){
-                  commonMessage.setResult(Constant.GET_DATE_SUCCESS);
-                  commonMessage.setContent(date);
-                  return commonMessage;
+                  commonResponse.setResult(Constant.GET_DATE_SUCCESS);
+                  commonResponse.setContent(date);
+                  return commonResponse;
               }else{
-                  commonMessage.setResult(Constant.GET_DATE_FAILED);
-                  commonMessage.setContent("");
-                  return commonMessage;
+                  commonResponse.setResult(Constant.GET_DATE_FAILED);
+                  commonResponse.setContent("");
+                  return commonResponse;
               }
            }else{
-               commonMessage.setResult(Constant.GET_DATE_FAILED);
-               commonMessage.setContent("");
-               return commonMessage;
+               commonResponse.setResult(Constant.GET_DATE_FAILED);
+               commonResponse.setContent("");
+               return commonResponse;
            }
 
     }
-
 
     private String getFormatDate(String date){
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
@@ -75,17 +85,16 @@ public class GankController {
     }
 
 
-
-
     @RequestMapping(value = "/addFav/{token}", method = RequestMethod.POST)
     public
     @ResponseBody
-    CommonMessage addFavorite(@RequestBody GankItemFWB.ResultsBean resultsBean, @PathVariable("token") String token) {
-        CommonMessage message = new CommonMessage();
+    CommonResponse<String> addFavorite(@RequestBody GankItem gankItem, @PathVariable("token") String token) {
+        CommonResponse<String> message = new CommonResponse<>();
         if (userService.checkUser(token)) {
             User userInfo = userService.getUserByUserToken(token);
-            if (gankWebService.addOneFav(userInfo, resultsBean)) {
+            if (gankWebService.addOneFav(userInfo, gankItem)) {
                 message.setResult(Constant.ADDFAV_SUCCESS);
+                message.setContent("");
                 return message;
             } else {
                 message.setResult(Constant.ADDFAV_ERROR);
@@ -99,6 +108,66 @@ public class GankController {
         }
     }
 
+
+
+
+
+    @RequestMapping(value = "deleteFav/{_id}",method = RequestMethod.POST)
+    public @ResponseBody CommonResponse<String> deleteOneFav(@RequestBody User user,@PathVariable("_id")String _id){
+        CommonResponse<String> commonResponse=new CommonResponse<>();
+        String token=user.getUserToken();
+        if (userService.checkUser(token)&&!_id.isEmpty()){
+            int userId=userService.getUserByUserToken(token).getUserId();
+           if (gankWebService.deleteOneFav_User(userId,_id)){
+                 commonResponse.setResult(Constant.DELETE_FAV_SUCCESS);
+                 commonResponse.setContent("");
+                 return commonResponse;
+           }else{
+               commonResponse.setResult(Constant.DELETE_FAV_ERROR);
+               commonResponse.setContent(Constant.DBUPDATE_ERROR);
+               return commonResponse;
+           }
+        }else{
+            commonResponse.setResult(Constant.DELETE_FAV_ERROR);
+            commonResponse.setContent(Constant.USER_INVALID);
+            return commonResponse;
+        }
+    }
+
+
+    @RequestMapping(value = "/getFav/{type}/{page}/{count}",method = RequestMethod.POST)
+    public
+    @ResponseBody
+    GankFavs getFavs(@RequestBody User user,
+                     @PathVariable("type") String type,
+                     @PathVariable("page")int page,
+                     @PathVariable("count")int count){
+        GankFavs favs=new GankFavs();
+        if (userService.checkUser(user.getUserToken())){
+            String token=user.getUserToken();
+            int userId = userService.getUserByUserToken(token).getUserId();
+            List<GankFavItem> list=gankWebService.getFavListByType(userId,type,page,count);
+
+            if (list!=null && list.size()>0){
+                favs.setError(false);
+                Collections.reverse(list);
+                favs.setResult(list);
+                return favs;
+            }else{
+                favs.setError(true);
+                favs.setMessage(Constant.NO_MORE_DATA);
+                favs.setResult(null);
+                return favs;
+            }
+        }else{
+            favs.setError(true);
+            favs.setMessage(Constant.USER_INVALID);
+            favs.setResult(null);
+            return favs;
+        }
+    }
+
+
     /**
      * @param year  年
      * @param month 月
@@ -108,232 +177,57 @@ public class GankController {
     @RequestMapping(value = "/day/{year}/{month}/{day}", method = RequestMethod.POST)
     public
     @ResponseBody
-    GankDailyAllItemFWB getLatestRes(@PathVariable("year") String year,
+    Gank getLatestRes(@PathVariable("year") String year,
                                      @PathVariable("month") String month,
                                      @PathVariable("day") String day,
                                      @RequestBody User user) {
         String userToken = user.getUserToken();
         String date = year + "/" + month + "/" + day;
+
+
         gankWebService.init();
-        GankDailyAllItemFWB gankDailyAllItemFWB = gankWebService.getLatestRes(date);
+        Gank gank = gankWebService.getLatestRes(date);
         if (userService.checkUser(userToken)) {
-            return processApi(gankDailyAllItemFWB, getUserFavList(userToken));
-        } else return gankDailyAllItemFWB;
-    }
-
-    private GankDailyAllItemFWB processApi(GankDailyAllItemFWB gankDailyAllItemFWB, List<GankFav> gankFavs) {
-        GankDailyAllItemFWB.ResultsBean resultBean = gankDailyAllItemFWB.getResults();
-        List<GankDailyAllItemFWB.ResultsBean.AndroidBean> androidList = resultBean.getAndroid();
-        List<GankDailyAllItemFWB.ResultsBean.IOSBean> iOSList = resultBean.getIOS();
-        List<GankDailyAllItemFWB.ResultsBean.前端Bean> webList = resultBean.get前端();
-
-        if (gankFavs != null && gankFavs.size() > 0) {
-
-            List<GankFav> androidFavList = new ArrayList<>();
-            List<GankFav> iOSFavList = new ArrayList<>();
-            List<GankFav> webFavList = new ArrayList<>();
-
-            for (GankFav gankFav : gankFavs) {
-                String type = gankFav.getFav_type();
-                switch (type) {
-                    case "Android":
-                        androidFavList.add(gankFav);
-                        continue;
-                    case "iOS":
-                        iOSFavList.add(gankFav);
-                        continue;
-                    case "前端":
-                        webFavList.add(gankFav);
-                        continue;
-                    default:
-                }
-            }
-            if (androidFavList.size() > 0)
-                for (GankFav gankFav : androidFavList) {
-                    String favUrl = gankFav.getFav_url();
-                    if (androidList != null && androidList.size() > 0) {
-                        for (GankDailyAllItemFWB.ResultsBean.AndroidBean oldAndroid : androidList) {
-                            String oldUrl = oldAndroid.getUrl().trim();
-                            if (favUrl.equals(oldUrl))
-                                oldAndroid.setFav(true);
-                        }
-                    }
-                }
-
-            if (iOSFavList.size() > 0) {
-                for (GankFav gankFav : iOSFavList) {
-                    String favUrl = gankFav.getFav_url();
-                    if (iOSList != null && iOSList.size() > 0) {
-                        for (GankDailyAllItemFWB.ResultsBean.IOSBean oldIos : iOSList) {
-                            String oldUrl = oldIos.getUrl().trim();
-                            if (favUrl.equals(oldUrl))
-                                oldIos.setFav(true);
-                        }
-                    }
-                }
-            }
-
-            if (webFavList.size() > 0) {
-                for (GankFav gankFav : webFavList) {
-                    String favUrl = gankFav.getFav_url();
-                    if (webList != null && webList.size() > 0) {
-                        for (GankDailyAllItemFWB.ResultsBean.前端Bean oldWeb : webList) {
-                            String oldUrl = oldWeb.getUrl();
-                            if (oldUrl.equals(favUrl))
-                                oldWeb.setFav(true);
-                        }
-                    }
-                }
-            }
-        }
-        return gankDailyAllItemFWB;
+            int userId=userService.getUserByUserToken(userToken).getUserId();
+            List<String> ids=gankWebService.selectFavIdsByUserId(userId);
+            if (ids==null||ids.isEmpty())
+                return gank;
+            else
+                return gankHelper.progressData(gank,ids);
+        } else
+            return gank;
     }
 
 
-    @RequestMapping(value = "/getFav/{token}", method = RequestMethod.GET)
+    @RequestMapping(value = "/data/{type}/{page}", method = RequestMethod.POST)
     public
     @ResponseBody
-    GankFavMessage getUserFav(@PathVariable("token") String token) {
-        GankFavMessage message = new GankFavMessage();
-        if (userService.checkUser(token)) {
-            List<GankFav> userFavList = getUserFavList(token);
-            if (userFavList != null && userFavList.size() > 0) {
-                List<GankFav> androidFavList = new ArrayList<>();
-                List<GankFav> iOSFavList = new ArrayList<>();
-                List<GankFav> webFavList = new ArrayList<>();
-                for (GankFav gankFav : userFavList) {
-                    String type = gankFav.getFav_type();
-                    switch (type) {
-                        case "Android":
-                            androidFavList.add(gankFav);
-                            continue;
-                        case "iOS":
-                            iOSFavList.add(gankFav);
-                            continue;
-                        case "前端":
-                            webFavList.add(gankFav);
-                            continue;
-                        default:
-                    }
-                }
-                GankFavMessage.Content content = new GankFavMessage.Content();
-                List<String> category = new ArrayList<>();
-                if (androidFavList.size() > 0) {
-                    content.setAndroid(androidFavList);
-                    category.add("Android");
-                }
-                if (iOSFavList.size() > 0) {
-                    content.setIos(iOSFavList);
-                    category.add("iOS");
-                }
-                if (webFavList.size() > 0) {
-                    content.setWeb(webFavList);
-                    category.add("Web");
-                }
-                message.setCategory(category);
-                message.setContent(content);
-                message.setError(false);
-                return message;
-            } else {
-                message.setError(false);
-                message.setCategory(null);
-                message.setContent(null);
-                return message;
-            }
-        } else {
-            message.setCategory(null);
-            message.setError(true);
-            message.setContent(null);
-            return message;
-        }
-    }
-
-
-    /**
-     * 获取用户的收藏列表
-     * @param token 用户凭证
-     * @return list
-     */
-    private List<GankFav> getUserFavList(String token){
-        User userInfo = userService.getUserByUserToken(token);
-        int id = userInfo.getUserId();
-        return gankWebService.getFavListById(id);
-    }
-
-
-    /**
-     * 根据类型获取用户的收藏
-     * @param token 用户凭证
-     * @param type 收藏的类型
-     * @return list
-     */
-    private List<GankFav> getUserFavListByType(String token,String type){
-        User info=userService.getUserByUserToken(token);
-        int id=info.getUserId();
-        return gankWebService.getFavListByIdAndType(id,type);
-    }
-
-
-
-    @RequestMapping(value = "/data/{type}/{page}",method = RequestMethod.POST)
-    public
-    @ResponseBody
-    GankItemFWB getResByType(@PathVariable("type")String type,
-                             @PathVariable("page")int page,
-                             @RequestBody User user){
-        GankItemFWB gankItemFWB;
+    GankTypeItem getResByType(@PathVariable("type") String type,
+                              @PathVariable("page") int page,
+                              @RequestBody User user) {
+        GankTypeItem gankItems;
         gankWebService.init();
-        try{
-            gankItemFWB=gankWebService.getResByType(type,page);
-        }catch (NullPointerException e){
+        try {
+            gankItems = gankWebService.getResByType(type, page);
+        } catch (NullPointerException e) {
             e.printStackTrace();
-            return new GankItemFWB();
+            return new GankTypeItem();
         }
-        String token=user.getUserToken();
-        if (userService.checkUser(token))
-            return proFavItem1(token,type,gankItemFWB);
-        else
-            return gankItemFWB;
-
-    }
-
-    private GankItemFWB proFavItem1(String token,String type,GankItemFWB gankItemFWB){
-        switch (type){
-            case Constant.ANDROID:
-                List<GankFav> androidFavList=getUserFavListByType(token,Constant.ANDROID);
-                return proFavItem2(gankItemFWB,androidFavList);
-            case Constant.IOS:
-                List<GankFav> iosFavList=getUserFavListByType(token,Constant.IOS);
-                return proFavItem2(gankItemFWB,iosFavList);
-            case Constant.WEB:
-                List<GankFav> webFavList=getUserFavListByType(token,Constant.WEB);
-                return proFavItem2(gankItemFWB,webFavList);
-            default:
-                return gankItemFWB;
-        }
-    }
-
-    /**
-     * 对于按类型加载的数据的收藏标志的处理
-     * @param gankItemFWB 数据
-     * @param gankFavList 收藏数据
-     * @return gankweb
-     */
-    private GankItemFWB proFavItem2(GankItemFWB gankItemFWB, List<GankFav> gankFavList){
-        if (gankFavList!=null&&gankFavList.size()>0){
-            List<GankItemFWB.ResultsBean> resultsBeanList=gankItemFWB.getResults();
-            for (GankFav gankFav : gankFavList) {
-                String fav_Url=gankFav.getFav_url();
-                for (GankItemFWB.ResultsBean resultsBean : resultsBeanList) {
-                    if (fav_Url.equals(resultsBean.getUrl()))
-                        resultsBean.setFav(true);
-                }
+        String token = user.getUserToken();
+        if (userService.checkUser(token)) {
+            int userId = userService.getUserByUserToken(token).getUserId();
+            List<String> ids = gankWebService.selectFavIdsByUserIdAndType(userId, type);
+            if (ids == null || ids.isEmpty())
+                return gankItems;
+            else {
+                List<GankItem> list = gankHelper.progressData(gankItems, ids);
+                gankItems.setResult(list);
+                return gankItems;
             }
-        }
-        return gankItemFWB;
+        } else
+            return gankItems;
+
     }
-
-
 
 }
 

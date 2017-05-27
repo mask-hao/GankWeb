@@ -1,7 +1,8 @@
 package com.zhanghao.service;
 
-import com.zhanghao.entity.GankDailyAllItemFWB;
-import com.zhanghao.entity.GankItemFWB;
+import com.zhanghao.entity.Gank;
+import com.zhanghao.entity.GankItem;
+import com.zhanghao.entity.GankTypeItem;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -23,20 +24,20 @@ public interface GankService{
     *
     * */
     @GET("/api/data/{type}/10/{page}")
-    Call<GankItemFWB> getGankdataByType(
+    Call<GankTypeItem> getGankdataByType(
             @Path("type") String type,
             @Path("page") int page);
 
 
     //每天数据
     @GET("/api/day/{date}")
-    Call<GankDailyAllItemFWB> getGankItemByDay(
+    Call<Gank> getGankItemByDay(
             @Path("date") String date
     );
 
 
     @GET("/api/data/福利/1/{page}")
-    Call<GankItemFWB> getDate(
+    Call<GankTypeItem> getDate(
             @Path("page")int page
             );
 

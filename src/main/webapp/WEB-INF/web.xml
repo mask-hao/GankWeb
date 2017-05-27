@@ -30,5 +30,12 @@
   <listener>
     <listener-class>com.zhanghao.listener.MySessionListener</listener-class>
   </listener>
-
+<!--<filter>-->
+  <!--<filter-name>gankFilter</filter-name>-->
+  <!--<filter-class>com.zhanghao.filter.GankInterceptor</filter-class>-->
+<!--</filter>-->
+<!--<filter-mapping>-->
+  <!--<filter-name>gankFilter</filter-name>-->
+  <!--<url-pattern>/*</url-pattern>-->
+<!--</filter-mapping>-->
 </web-app>

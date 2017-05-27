@@ -1,6 +1,8 @@
 package com.zhanghao.web;
 
+import com.zhanghao.model.CommonResponse;
 import com.zhanghao.model.SplashImgBean;
+import com.zhanghao.util.Constant;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,7 +20,7 @@ import java.io.IOException;
 @RequestMapping("/api")
 public class SplashController {
 
-    private final String defaultImg="https://images.unsplash.com/photo-1489211914964-32c31f87e86b?dpr=1&auto=compress,format&fit=crop&w=767&h=511&q=80&cs=tinysrgb&crop=";
+    private final String defaultImg="https://images.unsplash.com/photo-1489211914964-32c31f87e86b?w=1080&h=1920";
 
     private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -32,11 +34,12 @@ public class SplashController {
             Element element=document.getElementById("gridSingle").select("div.y5w1y>a").first();
             String styleText=element.attr("style");
             int begin=styleText.indexOf("https:");
-            int end=styleText.indexOf("\");");
+            int end=styleText.indexOf("?");
             String img=styleText.substring(begin,end);
+            String realUrl=img+"?w=1080&h=1920";
             bean.setText("nothing");
-            bean.setImg(img);
-//            logger.info(img);
+            bean.setImg(realUrl);
+            logger.info(img);
         } catch (IOException e) {
             e.printStackTrace();
             bean.setText("nothing");
@@ -45,4 +48,43 @@ public class SplashController {
         }
         return bean;
     }
+
+
+
+
+    @RequestMapping("/start-img")
+    public @ResponseBody
+    CommonResponse<String> getSplashImage(){
+        CommonResponse<String> commonResponse=new CommonResponse<>();
+        try {
+            Document document= Jsoup.connect("https://unsplash.com/new")
+                    .timeout(10*1000)
+                    .get();
+            Element element=document.getElementById("gridSingle").select("div.y5w1y>a").first();
+            String styleText=element.attr("style");
+            int begin=styleText.indexOf("https:");
+            int end=styleText.indexOf("?");
+            String img=styleText.substring(begin,end);
+            String realUrl=img+"?w=1080&h=1920";
+            commonResponse.setResult(Constant.GET_START_IMG_SUCCESS);
+            commonResponse.setContent(realUrl);
+            logger.info(img);
+        } catch (IOException e) {
+            e.printStackTrace();
+            commonResponse.setResult(Constant.GET_START_IMG_SUCCESS);
+            commonResponse.setContent(defaultImg);
+            return commonResponse;
+        }
+        return commonResponse;
+    }
+
+
+
+
+
+
+
+
+
+
 }

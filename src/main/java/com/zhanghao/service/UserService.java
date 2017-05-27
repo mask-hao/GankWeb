@@ -51,12 +51,19 @@ public interface UserService {
 
 
     /**
+     * 移除一个用户
+     * @param userAccount 用户账号
+     * @return 是否移除
+     */
+    boolean removeUserByUserAccount(String userAccount);
+
+
+    /**
      * 获取一个完整的用户实体
      * @param token 用户凭证
      * @return user实体
      */
     User getUserByUserToken(String token);
-
 
     /**
      * 更新用户头像
