@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Controller
 @RequestMapping(value = "/api",produces = {"application/json;charset=UTF-8"})
-public class GankController extends WebContentGenerator {
+public class GankController{
 
 
     @Resource

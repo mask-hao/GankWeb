@@ -64,4 +64,32 @@ public interface GankWebService {
      */
     GankTypeItem getDate(int page);
 
+
+    GankTypeItem getRandomData(String type);
+
+
+    boolean addOneHis(User user,GankItem item);
+
+    List<String> selectHisTypeByUserId(int userId);
+
+
+
+
+    boolean addTags(User user,List<Tag> tags);
+
+    List<Tag> getAllTags();
+
+    List<String> selectTagsByUserId(int useriId);
+
+
+
+
+    GankCustom getCustomData(int userId);
+
+
+
+
+
+
+
 }

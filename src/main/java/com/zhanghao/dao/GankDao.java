@@ -1,6 +1,7 @@
 package com.zhanghao.dao;
 
 import com.zhanghao.entity.GankFavItem;
+import com.zhanghao.entity.Tag;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -30,4 +31,20 @@ public interface GankDao {
             @Param("userId")int userId,
             @Param("_id")String _id
     );
+    /*--------------------------------------------------------------------------------------*/
+
+    int addOneHis(GankFavItem item);
+    int addOneHis_User(@Param("userId") int userId,
+                        @Param("_id")String _id
+                        );
+    List<String> selectHisTypeByUserId(@Param("userId")int UserId);
+
+
+    int addOneTag_User(@Param("userId")int userId,
+                       @Param("tagId")int tagId);
+
+    List<String> selectUserTagsByUerId(@Param("userId")int userId);
+
+    List<Tag> selectAllTags();
+
 }
