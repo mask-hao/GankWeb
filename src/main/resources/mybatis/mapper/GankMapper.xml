@@ -18,6 +18,12 @@
 
 
 
+    <!--<resultMap id="tagResultMap" type="com.zhanghao.entity.Tag">-->
+        <!--<id column="id" jdbcType="INTEGER" property="id" />-->
+        <!--<result column="type" jdbcType="VARCHAR" property="type" />-->
+    <!--</resultMap>-->
+
+
     <select id="selectFavByType" resultMap="BaseResultMap">
       SELECT *
       FROM
@@ -45,7 +51,7 @@
     </select>
 
 
-
+    <!--收藏-->
 
     <insert id="addOneFav" parameterType="GankFavItem">
         INSERT ignore INTO favorite
@@ -65,6 +71,51 @@
     </delete>
 
 
+
+
+
+    <!--浏览记录-->
+
+    <insert id="addOneHis" parameterType="GankFavItem">
+        INSERT ignore INTO history
+        VALUES (#{_id},#{createdAt},#{desc},#{images},#{publishedAt},#{source},#{type},#{url},#{used},#{who});
+    </insert>
+
+
+    <select id="selectHisTypeByUserId" resultType="String">
+        SELECT type
+        FROM user_his , history
+        WHERE user_his.userId=#{userId}
+        AND user_his._id = history._id
+        ;
+    </select>
+
+
+
+    <insert id="addOneHis_User">
+        INSERT ignore INTO user_his(userId,_id)
+        VALUES (#{userId},#{_id})
+    </insert>
+
+
+    <insert id="addOneTag_User">
+          INSERT ignore INTO user_tag(userId,tagId)
+        VALUES (#{userId},#{tagId})
+    </insert>
+
+
+    <select id="selectUserTagsByUerId" resultType="String">
+        SELECT type
+        FROM tags,user_tag
+        WHERE user_tag.userId = #{userId}
+        AND user_tag.tagId = tags.id;
+    </select>
+
+
+    <select id="selectAllTags" resultType="com.zhanghao.entity.Tag">
+        SELECT *
+        FROM tags;
+    </select>
 
 
 </mapper>
