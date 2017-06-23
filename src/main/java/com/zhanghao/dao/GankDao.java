@@ -43,8 +43,10 @@ public interface GankDao {
     int addOneTag_User(@Param("userId")int userId,
                        @Param("tagId")int tagId);
 
-    List<String> selectUserTagsByUerId(@Param("userId")int userId);
+    List<String> selectUserTagsByUserId(@Param("userId")int userId);
 
     List<Tag> selectAllTags();
+
+    String selectTagByTagId(@Param("id")int tagId);
 
 }

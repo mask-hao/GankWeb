@@ -4,6 +4,7 @@ import com.zhanghao.dao.GankDao;
 import com.zhanghao.entity.*;
 import com.zhanghao.service.GankService;
 import com.zhanghao.service.GankWebService;
+import com.zhanghao.util.RandomUtil;
 import com.zhanghao.util.ValueComparator;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -128,9 +129,9 @@ public class GankWebServiceImpl implements GankWebService{
     }
 
     @Override
-    public GankTypeItem getRandomData(String type) {
+    public GankTypeItem getRandomData(String type,int count) {
         try {
-            return gankService.getRandomData(type).execute().body();
+            return gankService.getRandomData(type,count).execute().body();
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -171,8 +172,12 @@ public class GankWebServiceImpl implements GankWebService{
 
 
     @Override
-    public boolean addTags(User user, List<Tag> tags) {
-        return false;
+    public boolean addTags(int userId, List<Tag> tags) {
+        int count = 0;
+        for (Tag tag : tags) {
+           count += gankDao.addOneTag_User(userId,tag.getId());
+        }
+        return count>=tags.size();
     }
 
     @Override
@@ -181,12 +186,66 @@ public class GankWebServiceImpl implements GankWebService{
     }
 
     @Override
-    public List<String> selectTagsByUserId(int useriId) {
-        return gankDao.selectUserTagsByUerId(useriId);
+    public List<String> selectTagsByUserId(int userId) {
+        return gankDao.selectUserTagsByUserId(userId);
     }
 
 
+    /**
+     * 用户没有登录情况下获取数据
+     *
+     * @return
+     */
+    @Override
+    public GankCustom getRandomCustomData(List<Tag> localTags) {
 
+        int randCount = RandomUtil.getRandomFromRange(15, 10);
+        int localTagSize = localTags.size();
+
+        GankCustom custom = new GankCustom();
+        List<GankItem> customList = new ArrayList<>();
+        List<GankItem> customPhotos = new ArrayList<>();
+
+
+        while (localTagSize > 3) {//从本地标签中随机选择三个标签
+            int rand = RandomUtil.getRandomFromRange(localTagSize - 1, 0);
+            localTags.remove(rand);
+            localTagSize--;
+        }
+
+        int loadCount = (int) Math.floor(randCount / localTagSize);
+
+        for (Tag localTag : localTags) {
+            String s = localTag.getType();
+            if (!s.equals("福利")) {
+                List<GankItem> items = getRandomData(s, loadCount).getResult();
+                if (items != null)
+                    customList.addAll(items);
+            } else
+                customPhotos.addAll(getRandomData(s, 9).getResult());
+        }
+
+
+        Collections.shuffle(customList);
+
+        if (!customList.isEmpty()) {
+            custom.setItemList(customList);
+            custom.setError(false);
+            custom.setPhotos(customPhotos);
+            return custom;
+        } else {
+            custom.setItemList(null);
+            custom.setError(true);
+            custom.setPhotos(null);
+            return custom;
+        }
+    }
+
+
+    /**
+     * 用户登录情况下获取数据
+     * @return
+     */
     @Override
     public GankCustom getCustomData(int userId) {
         List<String> types = selectHisTypeByUserId(userId); //浏览数据统计
@@ -197,22 +256,35 @@ public class GankWebServiceImpl implements GankWebService{
 
         List<Map.Entry<String,Integer>> customType = getCustomType(allTags);
 
-
-        System.out.println(customType);
-
-
         GankCustom custom = new GankCustom();
         List<GankItem> customList = new ArrayList<>();
         List<GankItem> customPhotos = new ArrayList<>();
+
+        int total = 0;
         for (Map.Entry<String, Integer> entry : customType) {
-            List<GankItem> items = getRandomData(entry.getKey()).getResult();
+            total += entry.getValue();
+        }
+
+        int randTotalCount = RandomUtil.getRandomFromRange(13,10);
+
+        for (Map.Entry<String, Integer> entry : customType) {
+            double percent;
+            int randCount;
+            List<GankItem> items;
             //除了福利之外
-            if (items!=null && !items.isEmpty() && !entry.getKey().equals("福利")){
-                customList.addAll(items);
-            }else if (items!=null && !items.isEmpty() && entry.getKey().equals("福利")){
-                customPhotos.addAll(items);
+            if (!entry.getKey().equals("福利")){
+                 percent = entry.getValue()/total;
+                 randCount = (int) Math.floor(randTotalCount*percent);
+                 items = getRandomData(entry.getKey(),randCount).getResult();
+                 if (items!=null)
+                    customList.addAll(items);
+            }else{
+                //当用户标签为福利的时候获取9张图片
+                 items = getRandomData(entry.getKey(),9).getResult();
+                 customPhotos.addAll(items);
             }
         }
+
         Collections.shuffle(customList);
 
         if (customList.size()>0){

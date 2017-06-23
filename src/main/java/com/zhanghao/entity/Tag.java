@@ -22,4 +22,13 @@ public class Tag {
     public void setType(String type) {
         this.type = type;
     }
+
+
+    @Override
+    public String toString() {
+        return "Tag{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

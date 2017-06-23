@@ -42,6 +42,16 @@ public class Constant {
     public static final String GET_DATE_SUCCESS="获取日期成功";
     public static final String GET_DATE_FAILED="获取日期失败";
 
+
+    public static final String GET_TAGS_SUCCESS="获取标签成功";
+    public static final String GET_TAGS_FAILED="获取标签失败";
+
+    public static final String UPDATE_TAGS_SUCCESS="上传标签成功";
+    public static final String UPDATE_TAGS_FAILED="上传标签失败";
+
+
+    public static final String SAVE_IN_LOCALDB = "保存在本地数据库";
+
     public static final String GET_SEARCH_DATA_SUCCESS="获取搜索数据正确";
     public static final String GET_SEARCH_DATA_ERROR="获取搜索数据错误";
 

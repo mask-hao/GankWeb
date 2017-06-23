@@ -43,8 +43,8 @@ public interface GankService{
 
 
 
-    @GET("/api/random/data/{type}/10")
-    Call<GankTypeItem> getRandomData(@Path("type")String type);
+    @GET("/api/random/data/{type}/{count}")
+    Call<GankTypeItem> getRandomData(@Path("type")String type,@Path("count")int count);
 
 
 }

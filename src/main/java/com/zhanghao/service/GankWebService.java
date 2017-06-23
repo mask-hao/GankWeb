@@ -65,7 +65,7 @@ public interface GankWebService {
     GankTypeItem getDate(int page);
 
 
-    GankTypeItem getRandomData(String type);
+    GankTypeItem getRandomData(String type,int count);
 
 
     boolean addOneHis(User user,GankItem item);
@@ -75,17 +75,15 @@ public interface GankWebService {
 
 
 
-    boolean addTags(User user,List<Tag> tags);
+    boolean addTags(int userId,List<Tag> tags);
 
     List<Tag> getAllTags();
 
     List<String> selectTagsByUserId(int useriId);
 
 
-
-
     GankCustom getCustomData(int userId);
-
+    GankCustom getRandomCustomData(List<Tag> tags);
 
 
 

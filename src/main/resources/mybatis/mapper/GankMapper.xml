@@ -104,7 +104,7 @@
     </insert>
 
 
-    <select id="selectUserTagsByUerId" resultType="String">
+    <select id="selectUserTagsByUserId" resultType="String">
         SELECT type
         FROM tags,user_tag
         WHERE user_tag.userId = #{userId}
@@ -117,5 +117,10 @@
         FROM tags;
     </select>
 
+    <select id="selectTagByTagId" resultType="String">
+        SELECT type
+        FROM tags
+        WHERE id = #{id};
+    </select>
 
 </mapper>

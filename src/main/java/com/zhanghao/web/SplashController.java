@@ -23,31 +23,32 @@ public class SplashController {
     private final String defaultImg="https://images.unsplash.com/photo-1489211914964-32c31f87e86b?w=1080&h=1920";
 
     private final Logger logger= LoggerFactory.getLogger(this.getClass());
-
-    @RequestMapping("/start-image")
-    public @ResponseBody SplashImgBean getSplashImg(){
-        SplashImgBean bean=new SplashImgBean();
-        try {
-            Document document= Jsoup.connect("https://unsplash.com/new")
-                    .timeout(10*1000)
-                    .get();
-            Element element=document.getElementById("gridSingle").select("div.y5w1y>a").first();
-            String styleText=element.attr("style");
-            int begin=styleText.indexOf("https:");
-            int end=styleText.indexOf("?");
-            String img=styleText.substring(begin,end);
-            String realUrl=img+"?w=1080&h=1920";
-            bean.setText("nothing");
-            bean.setImg(realUrl);
-            logger.info(img);
-        } catch (IOException e) {
-            e.printStackTrace();
-            bean.setText("nothing");
-            bean.setImg(defaultImg);
-            return bean;
-        }
-        return bean;
-    }
+//
+//    @RequestMapping("/start-image")
+//    public @ResponseBody SplashImgBean getSplashImg(){
+//        SplashImgBean bean=new SplashImgBean();
+//        try {
+//            Document document= Jsoup.connect("https://unsplash.com/new")
+//                    .timeout(10*1000)
+//                    .get();
+//            System.out.println(document.outerHtml());
+//            Element element=document.getElementById("gridMulti").select("div._3vgBX>a").first();
+//            String styleText=element.attr("style");
+//            int begin=styleText.indexOf("https:");
+//            int end=styleText.indexOf("?");
+//            String img=styleText.substring(begin,end);
+//            String realUrl=img+"?w=1080&h=1920";
+//            bean.setText("nothing");
+//            bean.setImg(realUrl);
+//            logger.info(img);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            bean.setText("nothing");
+//            bean.setImg(defaultImg);
+//            return bean;
+//        }
+//        return bean;
+//    }
 
 
 
@@ -60,7 +61,7 @@ public class SplashController {
             Document document= Jsoup.connect("https://unsplash.com/new")
                     .timeout(10*1000)
                     .get();
-            Element element=document.getElementById("gridSingle").select("div.y5w1y>a").first();
+            Element element=document.getElementById("gridMulti").select("div._3vgBX>a").first();
             String styleText=element.attr("style");
             int begin=styleText.indexOf("https:");
             int end=styleText.indexOf("?");
