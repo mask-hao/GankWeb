@@ -45,11 +45,15 @@ public class GankRecommendController {
         gankWebService.init();
         String token = user.getUserToken();
         if (userService.checkUser(token)){
+            System.out.println("yonghu youxiao ");
             //个性推荐
             User info = userService.getUserByUserToken(token);
             int userId = info.getUserId();
+
+            //todo 数据无效修复
             return gankWebService.getCustomData(userId);
         }else{
+            System.out.println("yonghu wuxiao ");
             GankCustom custom=new GankCustom();
             custom.setError(true);
             return custom;

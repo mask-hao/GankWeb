@@ -268,13 +268,12 @@ public class GankWebServiceImpl implements GankWebService{
         int randTotalCount = RandomUtil.getRandomFromRange(13,10);
 
         for (Map.Entry<String, Integer> entry : customType) {
-            double percent;
-            int randCount;
             List<GankItem> items;
             //除了福利之外
             if (!entry.getKey().equals("福利")){
-                 percent = entry.getValue()/total;
-                 randCount = (int) Math.floor(randTotalCount*percent);
+                 double now = entry.getValue();
+                 double percent = now/total;
+                 int randCount = (int) Math.floor(randTotalCount*percent);
                  items = getRandomData(entry.getKey(),randCount).getResult();
                  if (items!=null)
                     customList.addAll(items);
