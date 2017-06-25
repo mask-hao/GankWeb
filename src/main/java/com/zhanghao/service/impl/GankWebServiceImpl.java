@@ -289,7 +289,10 @@ public class GankWebServiceImpl implements GankWebService{
         if (customList.size()>0){
             custom.setError(false);
             custom.setItemList(customList);
-            custom.setPhotos(customPhotos);
+            if (custom.getPhotos()==null || custom.getPhotos().isEmpty()){
+                List<GankItem> items =getRandomData("福利",9).getResult();
+                custom.setPhotos(items);
+            }
             return custom;
         }else{
             custom.setError(true);
