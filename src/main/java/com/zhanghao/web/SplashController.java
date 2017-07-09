@@ -61,8 +61,8 @@ public class SplashController {
             Document document= Jsoup.connect("https://unsplash.com/new")
                     .timeout(10*1000)
                     .get();
-            Element element=document.getElementById("gridMulti").select("div._3vgBX>a").first();
-            String styleText=element.attr("style");
+            Element element=document.getElementById("gridMulti").select("div._3vgBX>a>img").first();
+            String styleText=element.attr("src");
             int begin=styleText.indexOf("https:");
             int end=styleText.indexOf("?");
             String img=styleText.substring(begin,end);
